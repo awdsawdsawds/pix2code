@@ -16,8 +16,28 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
     np.random.seed(1234)
 
     dataset = Dataset()
+    # TODO: ย่อ comment
+    # load training data เพื่อเอามาสร้างตัวแปรสำหรับเข้าโมเดล ซึ่งจะมี
+    # 1. dataset.ids คือ unigue index โดยสร้างจากชื่อไฟล์ใน training set
+    # 2. dataset.size คือ ตัวเลขจำนวนของ training set
+    # 3. dataset.partial_sequences เป็น list ข้อมูล จาก GUI ที่เก็บเป็น partial sequences (ข้อมูลตั้งแต่เริ่มต้นถึงปัจจุบัน)
+    #   มี 2 แบบซึ่งในที่นี้เราจะใช้ format one hot endcoding
+    #   - ถ้าเป็น generate_binary_sequences=True จะ format one hot vector
+    #      : [[[1, 0, ..., 0]], [[1, 0, ..., 0], [0, 1, ..., 0]], ..., [[1, 0, ..., 0], [0, 1, ..., 0], ..., [0, 0, ..., 1]]]
+    #   - ถ้าเป็น generate_binary_sequences=Fasle จะ format by index
+    #      : [[0], [0, 1], ..., [0, 1, ..., n]]
+    # 4. dataset.next_words คือ list ของ label ที่เป็น one hot vector: [[1, 0, 0], ..., [0, 0, 1]]
+    # 5. dataset.voc.vocabulary เป็น dict ของ คำที่พบใน .gui
+    #   : { "<START>": 0, "head": 1, "{": 2, ..., "<END>": n }
+    # 6. dataset.voc.token_lookup เป็น dict ที่คล้ายกับ dataset.voc.vocabulary แต่จะสลับตรง key และ value
+    #   : { "0": "<START>", "1": "head", "2": "{", ..., n: "<END>" }
+    # 7. dataset.voc.binary_vocabulary เป็น dict ที่เกิดจากการแปลง dataset.voc.vocabulary เอามาทำ one hot vector
+    #   : { "<START>": [1, 0, 0, ..., 0], "head": [0, 1, 0, ..., 0], "{": [0, 0, 1, ..., 0], ..., "<END>": [0, 0, 0, ..., 1] }
+    # 8. dataset.voc.size คือ ตัวเลขจำนวนของ vocabulary: ตัวเลขจำนวนของคำที่พบใน .gui
     dataset.load(input_path, generate_binary_sequences=True)
+    # save input_shape, output_size, size ในไฟล์ meta_dataset
     dataset.save_metadata(output_path)
+    # save dataset.voc.binary_vocabulary metadata ในไฟล์ words.vocab
     dataset.voc.save(output_path)
 
     if not is_memory_intensive:
@@ -58,9 +78,14 @@ if __name__ == "__main__":
         print("train.py <input path> <output path> <is memory intensive (default: 0)> <pretrained weights (optional)>")
         exit(0)
     else:
+        # รับ input_path, output_path, use_generator, pretrained_weigths จาก argument ของ command line
+        # input_path คือ path ของ dataset ควรเป็น path จาก step convert_imgs_to_arrays
         input_path = argv[0]
+        # output_path คือ path ที่จะ save output ของ step นี้
         output_path = argv[1]
+        # use_generator คือ สิ่งที่บอกว่าเราจะใช้ option memory intensive รึเปล่า (default เป็น False)
         use_generator = False if len(argv) < 3 else True if int(argv[2]) == 1 else False
+        # pretrained_weigths คือ path ของ pretrained weigths ต้องการใส่ไปใน model (default เป็น None)
         pretrained_weigths = None if len(argv) < 4 else argv[3]
 
     run(input_path, output_path, is_memory_intensive=use_generator, pretrained_model=pretrained_weigths)

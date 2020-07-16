@@ -48,6 +48,8 @@ class Generator:
                     batch_next_words.append(label)
                     sample_in_batch_counter += 1
 
+                    # condition แปลกๆ ตรง (loop_only_one and i == len(gui_paths) - 1)
+                    # ถ้ารอบสุดท้ายข้อมูลมีน้อยกว่า batch_size ทำยังไง
                     if sample_in_batch_counter == batch_size or (loop_only_one and i == len(gui_paths) - 1):
                         if verbose:
                             print("Generating sparse vectors...")

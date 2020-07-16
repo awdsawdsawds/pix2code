@@ -49,9 +49,11 @@ class Dataset:
                 gui = open("{}/{}".format(path, f), 'r')
                 file_name = f[:f.find(".gui")]
 
+                # ถ้าเป็น file .png
                 if os.path.isfile("{}/{}.png".format(path, file_name)):
                     img = Utils.get_preprocessed_img("{}/{}.png".format(path, file_name), IMAGE_SIZE)
                     self.append(file_name, gui, img)
+                # ถ้าเป็น file .npz
                 elif os.path.isfile("{}/{}.npz".format(path, file_name)):
                     img = np.load("{}/{}.npz".format(path, file_name))["features"]
                     self.append(file_name, gui, img)
