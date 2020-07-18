@@ -6,11 +6,26 @@ __author__ = 'Tony Beltramelli - www.tonybeltramelli.com'
 import tensorflow as tf
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
+import os
 import sys
+import pickle
+from datetime import datetime
 
 from classes.dataset.Generator import *
 from classes.model.pix2code import *
 
+HISTORY_DIR = "./history/"
+
+
+def save_history(filename, history):
+    print("save history to file")
+    if not os.path.exists(HISTORY_DIR):
+        os.makedirs(HISTORY_DIR)
+
+    now = datetime.now().strftime('%d:%m:%Y,%H:%M:%S')
+
+    with open(f"{HISTORY_DIR}/{filename}-{now}.pickle","wb") as pickle_out:
+        pickle.dump(history, pickle_out)
 
 def run(input_path, output_path, is_memory_intensive=False, pretrained_model=None):
     np.random.seed(1234)
@@ -68,9 +83,11 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
         model.model.load_weights(pretrained_model)
 
     if not is_memory_intensive:
-        model.fit(dataset.input_images, dataset.partial_sequences, dataset.next_words)
+        history = model.fit(dataset.input_images, dataset.partial_sequences, dataset.next_words)
+        save_history('history-feed-all', history)
     else:
-        model.fit_generator(generator, steps_per_epoch=steps_per_epoch)
+        history = model.fit_generator(generator, steps_per_epoch=steps_per_epoch)
+        save_history('history-feed-stream', history)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
