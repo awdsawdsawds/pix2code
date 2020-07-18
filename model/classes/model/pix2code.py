@@ -59,7 +59,7 @@ class pix2code(AModel):
         self.model = Model(inputs=[visual_input, textual_input], outputs=decoder)
 
         optimizer = RMSprop(lr=0.0001, clipvalue=1.0)
-        self.model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy')
+        self.model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     def fit(self, images, partial_captions, next_words):
         history = self.model.fit([images, partial_captions], next_words, shuffle=False, epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)

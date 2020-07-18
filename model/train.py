@@ -14,7 +14,7 @@ from datetime import datetime
 from classes.dataset.Generator import *
 from classes.model.pix2code import *
 
-HISTORY_DIR = "./history/"
+HISTORY_DIR = "../history/"
 
 
 def save_history(filename, history):
