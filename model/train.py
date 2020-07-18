@@ -35,11 +35,12 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
     #   : { "<START>": [1, 0, 0, ..., 0], "head": [0, 1, 0, ..., 0], "{": [0, 0, 1, ..., 0], ..., "<END>": [0, 0, 0, ..., 1] }
     # 8. dataset.voc.size คือ ตัวเลขจำนวนของ vocabulary: ตัวเลขจำนวนของคำที่พบใน .gui
     dataset.load(input_path, generate_binary_sequences=True)
-    # save input_shape, output_size, size ในไฟล์ meta_dataset
+    # save input_shape, output_size, size ในไฟล์ meta_dataset.npy
     dataset.save_metadata(output_path)
     # save dataset.voc.binary_vocabulary metadata ในไฟล์ words.vocab
     dataset.voc.save(output_path)
 
+    # ถ้า is_memory_intensive = False เราจะ get metadata จาก ตัวแปร dataset ตรงๆ  
     if not is_memory_intensive:
         dataset.convert_arrays()
 
@@ -48,6 +49,7 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
 
         print(len(dataset.input_images), len(dataset.partial_sequences), len(dataset.next_words))
         print(dataset.input_images.shape, dataset.partial_sequences.shape, dataset.next_words.shape)
+    # ถ้า is_memory_intensive = True เราจะสร้าง generator ขึ้นมา
     else:
         gui_paths, img_paths = Dataset.load_paths_only(input_path)
 

@@ -43,6 +43,7 @@ for f in os.listdir(input_path):
 evaluation_samples_number = len(paths) / (distribution + 1)
 training_samples_number = evaluation_samples_number * distribution
 
+# ตรวจสอบความถูกต้อง
 assert training_samples_number + evaluation_samples_number == len(paths)
 
 print("Splitting datasets, training samples: {}, evaluation samples: {}".format(training_samples_number, evaluation_samples_number))

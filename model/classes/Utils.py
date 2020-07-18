@@ -16,6 +16,8 @@ class Utils:
 
         return np.array(sparse_vector)
 
+    # อ่าน pixel ของ image file ด้วยระบบสี ฺBRG format
+    # แล้วทำการ resize รูปภาพและ ทำ normalize ให้อยู่ในช่วง 0 - 1
     @staticmethod
     def get_preprocessed_img(img_path, image_size):
         import cv2
