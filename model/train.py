@@ -27,7 +27,7 @@ def save_history(filename, history):
     with open(f"{HISTORY_DIR}/{filename}-{now}.pickle","wb") as pickle_out:
         pickle.dump(history, pickle_out)
 
-def run(input_path, output_path, is_memory_intensive=False, pretrained_model=None):
+def run(input_path, eval_input_path, output_path, is_memory_intensive=False, pretrained_model=None):
     np.random.seed(1234)
 
     dataset = Dataset()
@@ -49,7 +49,7 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
     # 7. dataset.voc.binary_vocabulary เป็น dict ที่เกิดจากการแปลง dataset.voc.vocabulary เอามาทำ one hot vector
     #   : { "<START>": [1, 0, 0, ..., 0], "head": [0, 1, 0, ..., 0], "{": [0, 0, 1, ..., 0], ..., "<END>": [0, 0, 0, ..., 1] }
     # 8. dataset.voc.size คือ ตัวเลขจำนวนของ vocabulary: ตัวเลขจำนวนของคำที่พบใน .gui
-    dataset.load(input_path, generate_binary_sequences=True)
+    dataset.load_train_and_eval(input_path, generate_binary_sequences=True)
     # save input_shape, output_size, size ในไฟล์ meta_dataset.npy
     dataset.save_metadata(output_path)
     # save dataset.voc.binary_vocabulary metadata ในไฟล์ words.vocab
@@ -82,11 +82,12 @@ def run(input_path, output_path, is_memory_intensive=False, pretrained_model=Non
     if pretrained_model is not None:
         model.model.load_weights(pretrained_model)
 
+    eval = ([dataset.eval_input_images, dataset.eval_partial_sequences], dataset.eval_next_words)
     if not is_memory_intensive:
-        history = model.fit(dataset.input_images, dataset.partial_sequences, dataset.next_words)
+        history = model.fit(dataset.input_images, dataset.partial_sequences, dataset.next_words, eval)
         save_history('history-feed-all', history)
     else:
-        history = model.fit_generator(generator, steps_per_epoch=steps_per_epoch)
+        history = model.fit_generator(generator, eval, steps_per_epoch=steps_per_epoch)
         save_history('history-feed-stream', history)
 
 if __name__ == "__main__":
@@ -100,11 +101,20 @@ if __name__ == "__main__":
         # รับ input_path, output_path, use_generator, pretrained_weigths จาก argument ของ command line
         # input_path คือ path ของ dataset ควรเป็น path จาก step convert_imgs_to_arrays
         input_path = argv[0]
-        # output_path คือ path ที่จะ save output ของ step นี้
-        output_path = argv[1]
-        # use_generator คือ สิ่งที่บอกว่าเราจะใช้ option memory intensive รึเปล่า (default เป็น False)
-        use_generator = False if len(argv) < 3 else True if int(argv[2]) == 1 else False
-        # pretrained_weigths คือ path ของ pretrained weigths ต้องการใส่ไปใน model (default เป็น None)
-        pretrained_weigths = None if len(argv) < 4 else argv[3]
 
-    run(input_path, output_path, is_memory_intensive=use_generator, pretrained_model=pretrained_weigths)
+        eval_input_path = argv[1]
+        # output_path คือ path ที่จะ save output ของ step นี้
+        output_path = argv[2]
+        # use_generator คือ สิ่งที่บอกว่าเราจะใช้ option memory intensive รึเปล่า (default เป็น False)
+        use_generator = False if len(argv) < 4 else True if int(argv[3]) == 1 else False
+        # pretrained_weigths คือ path ของ pretrained weigths ต้องการใส่ไปใน model (default เป็น None)
+        pretrained_weigths = None if len(argv) < 5 else argv[4]
+
+    print("=======")
+    print("input_path", input_path)
+    print("eval_input_path", eval_input_path)
+    print("output_path", output_path)
+    print("use_generator", use_generator)
+    print("pretrained_weigths", pretrained_weigths)
+    print("=======")
+    run(input_path, eval_input_path, output_path, is_memory_intensive=use_generator, pretrained_model=pretrained_weigths)
