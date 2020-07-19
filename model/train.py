@@ -49,7 +49,7 @@ def run(input_path, eval_input_path, output_path, is_memory_intensive=False, pre
     # 7. dataset.voc.binary_vocabulary เป็น dict ที่เกิดจากการแปลง dataset.voc.vocabulary เอามาทำ one hot vector
     #   : { "<START>": [1, 0, 0, ..., 0], "head": [0, 1, 0, ..., 0], "{": [0, 0, 1, ..., 0], ..., "<END>": [0, 0, 0, ..., 1] }
     # 8. dataset.voc.size คือ ตัวเลขจำนวนของ vocabulary: ตัวเลขจำนวนของคำที่พบใน .gui
-    dataset.load_train_and_eval(input_path, generate_binary_sequences=True)
+    dataset.load_train_and_eval(input_path, eval_input_path, generate_binary_sequences=True)
     # save input_shape, output_size, size ในไฟล์ meta_dataset.npy
     dataset.save_metadata(output_path)
     # save dataset.voc.binary_vocabulary metadata ในไฟล์ words.vocab

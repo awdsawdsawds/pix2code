@@ -26,6 +26,27 @@ class Dataset:
         self.size = 0
         self.eval_size = 0
 
+    @staticmethod
+    def load_paths_only(path):
+        print("Parsing data...")
+        gui_paths = []
+        img_paths = []
+        for f in os.listdir(path):
+            if f.find(".gui") != -1:
+                path_gui = "{}/{}".format(path, f)
+                gui_paths.append(path_gui)
+                file_name = f[:f.find(".gui")]
+
+                if os.path.isfile("{}/{}.png".format(path, file_name)):
+                    path_img = "{}/{}.png".format(path, file_name)
+                    img_paths.append(path_img)
+                elif os.path.isfile("{}/{}.npz".format(path, file_name)):
+                    path_img = "{}/{}.npz".format(path, file_name)
+                    img_paths.append(path_img)
+
+        assert len(gui_paths) == len(img_paths)
+        return gui_paths, img_paths
+
     def load_train_and_eval(self, path, eval_path, generate_binary_sequences=False):
         print("Loading data...")
         # train
