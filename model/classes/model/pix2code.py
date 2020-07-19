@@ -4,6 +4,7 @@ __author__ = 'Tony Beltramelli - www.tonybeltramelli.com'
 from keras.layers import Input, Dense, Dropout, \
                          RepeatVector, LSTM, concatenate, \
                          Conv2D, MaxPooling2D, Flatten
+from keras.applications import EfficientNetB0
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop
 from keras import *
@@ -16,28 +17,8 @@ class pix2code(AModel):
         AModel.__init__(self, input_shape, output_size, output_path)
         self.name = "pix2code"
 
-        image_model = Sequential()
-        image_model.add(Conv2D(32, (3, 3), padding='valid', activation='relu', input_shape=input_shape))
-        image_model.add(Conv2D(32, (3, 3), padding='valid', activation='relu'))
-        image_model.add(MaxPooling2D(pool_size=(2, 2)))
-        image_model.add(Dropout(0.25))
-
-        image_model.add(Conv2D(64, (3, 3), padding='valid', activation='relu'))
-        image_model.add(Conv2D(64, (3, 3), padding='valid', activation='relu'))
-        image_model.add(MaxPooling2D(pool_size=(2, 2)))
-        image_model.add(Dropout(0.25))
-
-        image_model.add(Conv2D(128, (3, 3), padding='valid', activation='relu'))
-        image_model.add(Conv2D(128, (3, 3), padding='valid', activation='relu'))
-        image_model.add(MaxPooling2D(pool_size=(2, 2)))
-        image_model.add(Dropout(0.25))
-
-        image_model.add(Flatten())
-        image_model.add(Dense(1024, activation='relu'))
-        image_model.add(Dropout(0.3))
-        image_model.add(Dense(1024, activation='relu'))
-        image_model.add(Dropout(0.3))
-
+        image_model = Sequential(include_top=False)
+        image_model.add(EfficientNetB0(input_shape=input_shape))
         image_model.add(RepeatVector(CONTEXT_LENGTH))
 
         visual_input = Input(shape=input_shape)
