@@ -82,6 +82,7 @@ def run(input_path, eval_input_path, output_path, is_memory_intensive=False, pre
     if pretrained_model is not None:
         model.model.load_weights(pretrained_model)
 
+    dataset.eval_convert_arrays()
     eval = ([dataset.eval_input_images, dataset.eval_partial_sequences], dataset.eval_next_words)
     if not is_memory_intensive:
         history = model.fit(dataset.input_images, dataset.partial_sequences, dataset.next_words, eval)

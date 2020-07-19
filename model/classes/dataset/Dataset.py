@@ -112,6 +112,12 @@ class Dataset:
         self.partial_sequences = np.array(self.partial_sequences)
         self.next_words = np.array(self.next_words)
 
+    def eval_convert_arrays(self):
+        print("Convert arrays...")
+        self.eval_input_images = np.array(self.eval_input_images)
+        self.eval_partial_sequences = np.array(self.eval_partial_sequences)
+        self.eval_next_words = np.array(self.eval_next_words)
+
     def append(self, sample_id, gui, img, to_show=False):
         if to_show:
             pic = img * 255
